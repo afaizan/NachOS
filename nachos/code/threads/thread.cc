@@ -55,6 +55,7 @@ NachOSThread::NachOSThread(char* threadName)
     }
     space = NULL;
     stateRestored = true;
+    instructionCount = 0;
 #endif
 }
 
@@ -351,5 +352,17 @@ int NachOSThread::GetPPID()
     return this->ppid;
 }
 
+void
+NachOSThread::IncInstructionCount(void)
+{
+	instructionCount++;
+}	
+
+
+unsigned
+NachOSThread::GetInstructionCount(void)
+{
+	return this->instructionCount;
+}	
 #endif
 
