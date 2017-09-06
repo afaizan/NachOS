@@ -33,6 +33,8 @@ main()
     syscall_wrapper_PrintChar('\n');
     syscall_wrapper_PrintInt(syscall_wrapper_GetTime());
     syscall_wrapper_PrintChar('\n');
+    syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
+    syscall_wrapper_PrintChar('\n');
     syscall_wrapper_Exit(0);
 
     return 0;
