@@ -10,9 +10,9 @@ main()
     syscall_wrapper_PrintString("Total sum: ");
     syscall_wrapper_PrintInt(sum);
     syscall_wrapper_PrintChar('\n');
-    syscall_wrapper_PrintString("Executed instruction count: ");
-    syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
-    syscall_wrapper_PrintChar('\n');
+    //syscall_wrapper_PrintString("Executed instruction count: ");
+    //syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
+    //syscall_wrapper_PrintChar('\n');
     syscall_wrapper_Exit(0);
     return 0;
 }
