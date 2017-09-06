@@ -105,6 +105,10 @@ class NachOSThread {
     void Print() { printf("%s, ", name); }
     int GetPID();
     int GetPPID();
+	
+    void IncInstructionCount();
+    unsigned GetInstructionCount();
+		
   private:
     // some of the private data for this class is listed above
     
@@ -120,6 +124,8 @@ class NachOSThread {
 
     int pid, ppid;			// My pid and my parent's pid
     NachOSThread* parentthread;
+
+    unsigned instructionCount;	
 
 #ifdef USER_PROGRAM
 // A thread running a user program actually has *two* sets of CPU registers -- 
