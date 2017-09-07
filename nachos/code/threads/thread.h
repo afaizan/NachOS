@@ -49,7 +49,7 @@
 // The SPARC and MIPS only need 10 registers, but the Snake needs 18.
 // For simplicity, this is just the max over all architectures.
 #define MachineStateSize 18 
-
+#define CHILD_LIVE -2
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
@@ -103,8 +103,11 @@ class NachOSThread {
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
+
+    //returns the pid of thread	
     int GetPID();
     int GetPPID();
+    int *child_pids;  // to store the child pids
 	
     void IncInstructionCount();
     unsigned GetInstructionCount();
@@ -112,6 +115,8 @@ class NachOSThread {
   private:
     // some of the private data for this class is listed above
     
+    int *child_status;                // To store the state of the children
+    int childCount;                   // Used to store the number of children of the thread.
     int* stack; 	 		// Bottom of the stack 
 					// NULL if this is the main thread
 					// (If NULL, don't deallocate stack)
@@ -140,6 +145,16 @@ class NachOSThread {
     void RestoreUserState();		// restore user-level register state
 
     ProcessAddressSpace *space;			// User code this thread is running.
+	
+    //to manipulate the status of chidthread
+    void initializeChildStatus(int child_pid); 	
+ 
+    //To maintain the child counts	
+    void IncChildCount();     
+    void DecChildCount();     
+	
+	
+	
 #endif
 };
 
