@@ -23,6 +23,13 @@ class ProcessAddressSpace {
     ProcessAddressSpace(OpenFile *executable);	// Create an address space,
 					// initializing it with the program
 					// stored in the file "executable"
+	
+    ProcessAddressSpace(unsigned int numParentPages, unsigned int parentStartPhysPage); 
+						// Create an address space,
+                    				// create a page table, map it to memory
+						// copy parents segment
+	
+	
     ~ProcessAddressSpace();			// De-allocate an address space
 
     void InitUserModeCPURegisters();		// Initialize user-level CPU registers,
@@ -30,7 +37,9 @@ class ProcessAddressSpace {
 
     void SaveContextOnSwitch();			// Save/restore address space-specific
     void RestoreContextOnSwitch();		// info on a context switch 
-
+    unsigned int getNumPages();  // returns the number of virtual pages in
+                                 // address space
+    unsigned int getStartPhysPage(); // return the start address of the physical page	
   private:
     TranslationEntry *KernelPageTable;	// Assume linear page table translation
 					// for now!

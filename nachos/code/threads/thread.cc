@@ -40,6 +40,8 @@ NachOSThread::NachOSThread(char* threadName)
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
+    childCount = 0;	
+    parentthread = NULL;	
 #ifdef USER_PROGRAM
     pid = availpid;
     availpid++;
@@ -352,6 +354,26 @@ int NachOSThread::GetPPID()
     return this->ppid;
 }
 
+
+
+void
+NachOSThread::initializeChildStatus(int child_pid) {
+    DEBUG('J', "Adding %d to the child list of %d\n", child_pid, pid);
+    child_pids[childCount] = child_pid;
+    child_status[childCount] = CHILD_LIVE;
+    IncChildCount();
+}
+
+void
+NachOSThread::IncChildCount() {
+    childCount++;
+}
+
+void
+NachOSThread::DecChildCount() {
+    childCount--;
+}
+
 void
 NachOSThread::IncInstructionCount(void)
 {
@@ -361,8 +383,34 @@ NachOSThread::IncInstructionCount(void)
 
 unsigned
 NachOSThread::GetInstructionCount(void)
-{
+{ 
 	return this->instructionCount;
 }	
+
+
+void 
+forkStart(int arg) {
+
+    // When a forked thread is called for the first time, it should appear as though
+    // it is just returing from the _SWITCH call
+    if (threadToBeDestroyed != NULL) {
+        delete threadToBeDestroyed;
+	threadToBeDestroyed = NULL;
+    }
+    
+#ifdef USER_PROGRAM
+    if (currentThread->space != NULL) {		// if there is an address space
+        currentThread->RestoreUserState();     // to restore, do it.
+	currentThread->space->RestoreContextOnSwitch(); 
+    }
+#endif
+
+    // This statement starts running the user thread in the context of newly
+    // created thred
+    machine->Run();
+}
+
+
+
 #endif
 

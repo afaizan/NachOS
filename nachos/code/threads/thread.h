@@ -49,7 +49,7 @@
 // The SPARC and MIPS only need 10 registers, but the Snake needs 18.
 // For simplicity, this is just the max over all architectures.
 #define MachineStateSize 18 
-
+#define CHILD_LIVE -2
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
@@ -62,6 +62,7 @@ enum ThreadStatus { JUST_CREATED, RUNNING, READY, BLOCKED };
 // external function, dummy routine whose sole job is to call NachOSThread::Print
 extern void ThreadPrint(int arg);	 
 
+extern void forkStart(int arg); // the function which is called when a process is forked 
 // The following class defines a "thread control block" -- which
 // represents a single thread of execution.
 //
@@ -88,9 +89,11 @@ class NachOSThread {
 					// NOTE -- thread being deleted
 					// must not be running when delete 
 					// is called
-
+   void CreateThreadStack(VoidFunctionPtr func, int arg);
+    					// Allocate a stack for thread.
+					// Used internally by ThreadFork()
     // basic thread operations
-
+	
     void ThreadFork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void YieldCPU();  				// Relinquish the CPU if any 
 						// other thread is runnable
@@ -103,8 +106,13 @@ class NachOSThread {
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
+
+    NachOSThread* parentthread;
+	
+    //returns the pid of thread	
     int GetPID();
     int GetPPID();
+    int *child_pids;  // to store the child pids
 	
     void IncInstructionCount();
     unsigned GetInstructionCount();
@@ -112,18 +120,15 @@ class NachOSThread {
   private:
     // some of the private data for this class is listed above
     
+    int *child_status;                // To store the state of the children
+    int childCount;                   // Used to store the number of children of the thread.
     int* stack; 	 		// Bottom of the stack 
 					// NULL if this is the main thread
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
 
-    void CreateThreadStack(VoidFunctionPtr func, int arg);
-    					// Allocate a stack for thread.
-					// Used internally by ThreadFork()
-
     int pid, ppid;			// My pid and my parent's pid
-    NachOSThread* parentthread;
 
     unsigned instructionCount;	
 
@@ -140,6 +145,16 @@ class NachOSThread {
     void RestoreUserState();		// restore user-level register state
 
     ProcessAddressSpace *space;			// User code this thread is running.
+	
+    //to manipulate the status of chidthread
+    void initializeChildStatus(int child_pid); 	
+ 
+    //To maintain the child counts	
+    void IncChildCount();     
+    void DecChildCount();     
+	
+	
+	
 #endif
 };
 
@@ -153,7 +168,7 @@ extern "C" {
 void _ThreadRoot();
 
 // Stop running oldThread and start running newThread
-void _SWITCH(NachOSThread *oldThread, NachOSThread *newThread);
+void _SWITCH(NachOSThread *oldThread, NachOSThread *newThread);  
 }
 
 #endif // THREAD_H

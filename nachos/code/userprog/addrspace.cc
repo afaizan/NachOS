@@ -20,6 +20,8 @@
 #include "addrspace.h"
 #include "noff.h"
 
+
+int totalPagesCount = 0;
 //----------------------------------------------------------------------
 // SwapHeader
 // 	Do little endian to big endian conversion on the bytes in the 
@@ -115,6 +117,51 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
 
 }
 
+
+ProcessAddressSpace::ProcessAddressSpace(unsigned int numParentPages, unsigned int parentStartPhysPage)
+{ 
+    unsigned int i, k, size;
+    numVirtualPages = numParentPages;        // number of pages is equal to parent
+    size = numVirtualPages * PageSize;
+
+    ASSERT(numVirtualPages + totalPagesCount <= NumPhysPages);		// check we're not trying
+    // to run anything too big --
+    // at least until we have
+    // virtual memory
+
+    DEBUG('a', "Initializing address space\nparent pages %d num pages %d, size %d\n", 
+            numParentPages , numVirtualPages, size);
+
+    // first, set up the translation 
+    KernelPageTable = new TranslationEntry[numVirtualPages];
+    for (i = 0; i < numVirtualPages; i++) {
+        KernelPageTable[i].virtualPage = i;	
+        KernelPageTable[i].physicalPage = i + totalPagesCount;
+        KernelPageTable[i].valid = TRUE;
+        KernelPageTable[i].use = FALSE;
+        KernelPageTable[i].dirty = FALSE;
+        KernelPageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
+        // a separate page, we could set its 
+        // pages to be read-only
+    }
+
+    // Now we have to copy the parent's code into the physical pages
+    unsigned int parentPhysEnd = (parentStartPhysPage + numVirtualPages) * PageSize; 
+    i = parentStartPhysPage * PageSize;
+    k = totalPagesCount * PageSize;
+
+    DEBUG('a', "Copying memory %d - %d to %d to %d\n", i, parentPhysEnd, k, k);
+    for(; i<parentPhysEnd; ++i, ++k) {
+        machine->mainMemory[k] = machine->mainMemory[i];
+    }
+
+    // Increment the totalPagesCount
+    totalPagesCount += numVirtualPages;
+    DEBUG('a', "totalPagesCount %d\n", totalPagesCount);
+
+}
+
+
 //----------------------------------------------------------------------
 // ProcessAddressSpace::~ProcessAddressSpace
 // 	Dealloate an address space.  Nothing for now!
@@ -180,4 +227,14 @@ void ProcessAddressSpace::RestoreContextOnSwitch()
 {
     machine->KernelPageTable = KernelPageTable;
     machine->pageTableSize = numVirtualPages;
+}
+
+unsigned int ProcessAddressSpace::getNumPages() 
+{
+    return numVirtualPages;
+}
+
+unsigned int ProcessAddressSpace::getStartPhysPage() 
+{
+    return KernelPageTable[0].physicalPage;
 }
