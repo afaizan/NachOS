@@ -89,9 +89,11 @@ class NachOSThread {
 					// NOTE -- thread being deleted
 					// must not be running when delete 
 					// is called
-
+   void CreateThreadStack(VoidFunctionPtr func, int arg);
+    					// Allocate a stack for thread.
+					// Used internally by ThreadFork()
     // basic thread operations
-
+	
     void ThreadFork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void YieldCPU();  				// Relinquish the CPU if any 
 						// other thread is runnable
@@ -125,10 +127,6 @@ class NachOSThread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
-
-    void CreateThreadStack(VoidFunctionPtr func, int arg);
-    					// Allocate a stack for thread.
-					// Used internally by ThreadFork()
 
     int pid, ppid;			// My pid and my parent's pid
 
