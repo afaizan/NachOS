@@ -297,6 +297,11 @@ ExceptionHandler(ExceptionType which)
 	// Allocating the stack 
 	child->CreateThreadStack(&forkStart, 0);   
 	   
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    	scheduler->MoveThreadToReadyQueue(this);	// MoveThreadToReadyQueue assumes that interrupts 
+							// are disabled!
+	(void) interrupt->SetLevel(oldLevel);  
+	   
 	   
 	   
    }	   
