@@ -40,6 +40,8 @@ NachOSThread::NachOSThread(char* threadName)
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
+    childCount = 0;	
+    parentthread = NULL;	
 #ifdef USER_PROGRAM
     pid = availpid;
     availpid++;
@@ -351,6 +353,34 @@ int NachOSThread::GetPPID()
 {
     return this->ppid;
 }
+
+
+
+void
+NachOSThread::initializeChildStatus(int child_pid) {
+    DEBUG('J', "Adding %d to the child list of %d\n", child_pid, pid);
+    child_pids[childCount] = child_pid;
+    child_status[childCount] = CHILD_LIVE;
+    IncChildCount();
+}
+
+void
+NachOSThread::IncChildCount() {
+    childCount++;
+}
+
+void
+NachOSThread::DecChildCount() {
+    childCount--;
+}
+
+
+
+
+
+
+
+
 
 void
 NachOSThread::IncInstructionCount(void)
