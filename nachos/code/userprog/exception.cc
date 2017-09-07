@@ -299,7 +299,7 @@ ExceptionHandler(ExceptionType which)
 	   
 	//The child thread is now ready to run   
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);    //disables interrupt
-    	scheduler->MoveThreadToReadyQueue(this);	// MoveThreadToReadyQueue assumes that interrupts 
+    	scheduler->MoveThreadToReadyQueue(child);	// MoveThreadToReadyQueue assumes that interrupts 
 							// are disabled!
 	(void) interrupt->SetLevel(oldLevel);                //re-enable interrupt
 	      
