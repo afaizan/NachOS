@@ -234,6 +234,13 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
 
    }
+	else if((which == SyscallException) && (type == SysCall_Yield)){
+		currentThread->YieldCPU();
+		//Advance PC
+		machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+	        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       		machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+	}
    else if ((which == SyscallException) && (type == SysCall_Exec)){
 	vaddr = machine->ReadRegister(4);
 	char file[100];
