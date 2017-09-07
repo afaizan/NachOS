@@ -285,8 +285,8 @@ ExceptionHandler(ExceptionType which)
 	   
 	currentThread->initializeChildStatus(child->GetPID());
 	   
-	// Here we copy the address-space of the currentThread to the childThread   
-	child->space = new ProcessAddressSpace(currentThread->space->getNumPages(), currentThread->space->getStartPhysPage());    
+	// Here we copy(or duplicate) the address-space of the currentThread to the childThread   
+	child->space = new ProcessAddressSpace(currentThread->space);    
 	  
         machine->WriteRegister(2, 0);   // Change the return address register to 0
 	child->SaveUserState();         // save the child's state
@@ -294,16 +294,15 @@ ExceptionHandler(ExceptionType which)
 	// Setting the return value of the parent thread
 	machine->WriteRegister(2, child->GetPID());   
 	   
-	// Allocating the stack 
-	child->CreateThreadStack(&forkStart, 0);   
+	// Allocating the stack to the child thread
+	child->CreateThreadStack(&forkStart, 0);  
 	   
-	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+	//The child thread is now ready to run   
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);    //disables interrupt
     	scheduler->MoveThreadToReadyQueue(this);	// MoveThreadToReadyQueue assumes that interrupts 
 							// are disabled!
-	(void) interrupt->SetLevel(oldLevel);  
-	   
-	   
-	   
+	(void) interrupt->SetLevel(oldLevel);                //re-enable interrupt
+	      
    }	   
     else {
     	printf("Unexpected user mode exception %d %d\n", which, type);
