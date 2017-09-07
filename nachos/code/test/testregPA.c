@@ -24,10 +24,16 @@ main()
     for (i=0; i<SIZE; i++) sum += array[i];
     syscall_wrapper_PrintString("Total sum: ");
     syscall_wrapper_PrintInt(sum);
+    syscall_wrapper_PrintChar('\n');
     syscall_wrapper_PrintString("GetPID() : ");
     syscall_wrapper_PrintInt(syscall_wrapper_GetPID());
+    syscall_wrapper_PrintChar('\n');
     syscall_wrapper_PrintString("GetPPID() : ");
     syscall_wrapper_PrintInt(syscall_wrapper_GetPPID());
+    syscall_wrapper_PrintChar('\n');
+    syscall_wrapper_PrintInt(syscall_wrapper_GetTime());
+    syscall_wrapper_PrintChar('\n');
+    syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
     syscall_wrapper_PrintChar('\n');
     syscall_wrapper_Exit(0);
 
