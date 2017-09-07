@@ -374,14 +374,6 @@ NachOSThread::DecChildCount() {
     childCount--;
 }
 
-
-
-
-
-
-
-
-
 void
 NachOSThread::IncInstructionCount(void)
 {
@@ -394,5 +386,31 @@ NachOSThread::GetInstructionCount(void)
 { 
 	return this->instructionCount;
 }	
+
+
+void 
+forkStart(int arg) {
+
+    // When a forked thread is called for the first time, it should appear as though
+    // it is just returing from the _SWITCH call
+    if (threadToBeDestroyed != NULL) {
+        delete threadToBeDestroyed;
+	threadToBeDestroyed = NULL;
+    }
+    
+#ifdef USER_PROGRAM
+    if (currentThread->space != NULL) {		// if there is an address space
+        currentThread->RestoreUserState();     // to restore, do it.
+	currentThread->space->RestoreState();
+    }
+#endif
+
+    // This statement starts running the user thread in the context of newly
+    // created thred
+    machine->Run();
+}
+
+
+
 #endif
 
