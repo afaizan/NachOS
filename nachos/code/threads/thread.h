@@ -105,6 +105,8 @@ class NachOSThread {
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
 
+    NachOSThread* parentthread;
+	
     //returns the pid of thread	
     int GetPID();
     int GetPPID();
@@ -129,7 +131,6 @@ class NachOSThread {
 					// Used internally by ThreadFork()
 
     int pid, ppid;			// My pid and my parent's pid
-    NachOSThread* parentthread;
 
     unsigned instructionCount;	
 
