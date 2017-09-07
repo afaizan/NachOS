@@ -391,7 +391,7 @@ NachOSThread::IncInstructionCount(void)
 
 unsigned
 NachOSThread::GetInstructionCount(void)
-{
+{ 
 	return this->instructionCount;
 }	
 #endif
