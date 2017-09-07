@@ -168,7 +168,7 @@ extern "C" {
 void _ThreadRoot();
 
 // Stop running oldThread and start running newThread
-void _SWITCH(NachOSThread *oldThread, NachOSThread *newThread);
+void _SWITCH(NachOSThread *oldThread, NachOSThread *newThread); 
 }
 
 #endif // THREAD_H
