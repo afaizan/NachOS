@@ -181,3 +181,13 @@ void ProcessAddressSpace::RestoreContextOnSwitch()
     machine->KernelPageTable = KernelPageTable;
     machine->pageTableSize = numVirtualPages;
 }
+
+unsigned int ProcessAddressSpace::getNumPages() 
+{
+    return numVirtualPages;
+}
+
+unsigned int ProcessAddressSpace::getStartPhysPage() 
+{
+    return KernelPageTable[0].physicalPage;
+}
