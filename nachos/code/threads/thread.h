@@ -62,6 +62,7 @@ enum ThreadStatus { JUST_CREATED, RUNNING, READY, BLOCKED };
 // external function, dummy routine whose sole job is to call NachOSThread::Print
 extern void ThreadPrint(int arg);	 
 
+extern void forkStart(int arg); // the function which is called when a process is forked 
 // The following class defines a "thread control block" -- which
 // represents a single thread of execution.
 //
