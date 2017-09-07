@@ -30,7 +30,9 @@ class ProcessAddressSpace {
 
     void SaveContextOnSwitch();			// Save/restore address space-specific
     void RestoreContextOnSwitch();		// info on a context switch 
-
+    unsigned int getNumPages();  // returns the number of virtual pages in
+                                 // address space
+    unsigned int getStartPhysPage(); // return the start address of the physical page	
   private:
     TranslationEntry *KernelPageTable;	// Assume linear page table translation
 					// for now!
