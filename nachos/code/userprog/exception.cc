@@ -286,7 +286,7 @@ ExceptionHandler(ExceptionType which)
 	currentThread->initializeChildStatus(child->GetPID());
 	   
 	// Here we copy(or duplicate) the address-space of the currentThread to the childThread   
-	child->space = new ProcessAddressSpace(currentThread->space);    
+	child->space = new ProcessAddressSpace(currentThread->space->getNumPages(), currentThread->space->getStartPhysPage());    
 	  
         machine->WriteRegister(2, 0);   // Change the return address register to 0
 	child->SaveUserState();         // save the child's state
