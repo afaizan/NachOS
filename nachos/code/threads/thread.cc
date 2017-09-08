@@ -56,6 +56,11 @@ NachOSThread::NachOSThread(char* threadName)
     space = NULL;
     stateRestored = true;
     instructionCount = 0;
+    childCount=0;
+    waitchildindex = -1;
+    for(int i=0; i < MAXCHILDCOUNT;i++){
+	    childexitstatus[i] = false;
+    }
 #endif
 }
 
@@ -364,5 +369,51 @@ NachOSThread::GetInstructionCount(void)
 {
 	return this->instructionCount;
 }	
+
+int 
+NachOSThread::SearchChildpid(int a){
+	for(int i=0;i<childCount;i++){
+		if(child_pids[i]==a) return i;
+	}
+	return -1;
+}
+
+
+void 
+NachOSThread::SetChildExitCode(int childpid, int code){
+	int i;
+	i = SearchChildpid(childpid);
+	childexitcode[i] = code;
+	childexitstatus[i] = true;
+	
+	if(waitchildindex == i){
+		waitchildindex = -1;
+		IntStatus oldLevel = interrupt->SetLevel(IntOff);
+		scheduler->MoveThreadToReadyQueue(this);
+		(void) interrupt->SetLevel(oldLevel);		
+	}	
+	
+}
+
+
+int 
+NachOSThread::JoinThreadWithChild(int index){
+	if(childexitstatus[index]==false){
+		waitchildindex = index;
+		IntStatus oldLevel = interrupt->SetLevel(IntOff);
+		PutThreadToSleep(); 
+		(void) interrupt->SetLevel(oldLevel);
+	}
+	return childexitcode[index];
+
+}
+
+
+
+
+
+
+
+
 #endif
 
