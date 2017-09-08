@@ -271,6 +271,33 @@ ExceptionHandler(ExceptionType which)
 	machine->Run();
 //	ASSERT(FALSE);
    }
+   else if ((which == SyscallException) && (type == SysCall_Join)){
+	   
+	   int child_pid;
+	   child_pid = machine->ReadRegister(4);
+	   int index;
+	   index = currentThread->SearchChildpid(child_pid);
+	   
+	   if(index==-1){
+	   	printf("%d isn't child of %d",child_pid, currentThread->GetPID());
+		machine->WriteRegister(2, -1);
+		   
+	        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+	        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       		machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4); 
+	   }
+	   else
+	   {    int exitcode;
+	        exitcode = currentThread->JoinThreadWithChild(index);
+	        machine->WriteRegister(2, exitcode);
+	        
+	        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+	        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       		machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4); 
+	   }	   	   	   
+   }	   
+	
+
     else {
     	printf("Unexpected user mode exception %d %d\n", which, type);
     	ASSERT(FALSE);
