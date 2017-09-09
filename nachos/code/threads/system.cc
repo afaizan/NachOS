@@ -207,6 +207,7 @@ Cleanup()
     delete timer;
     delete scheduler;
     delete interrupt;
+    delete sleepingThreads;
     
     Exit(0);
 }
