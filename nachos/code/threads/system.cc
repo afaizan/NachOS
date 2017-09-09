@@ -18,6 +18,7 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+List *sleepingThreads;			// sorted by wakeup time sleeping threads
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -194,7 +195,8 @@ Cleanup()
     delete timer;
     delete scheduler;
     delete interrupt;
-    
+    delete sleepingThreads;
+	
     Exit(0);
 }
 
