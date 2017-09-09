@@ -18,6 +18,7 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+List *sleepingThreads;			// maintains list of sleeping threads sorted according to wakeup time
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -61,8 +62,20 @@ extern void Cleanup();
 static void
 TimerInterruptHandler(int dummy)
 {
-    if (interrupt->getStatus() != IdleMode)
-	interrupt->YieldOnReturn();
+    //if (interrupt->getStatus() != IdleMode)
+	//interrupt->YieldOnReturn();
+	if(sleepingThreads->IsEmpty()){//No thread to wakeup
+		return;
+	}
+	NachOSThread *ready;
+	int k;
+	while(!(sleepingThreads->IsEmpty())&&sleepingThreads->getfirstKey()<=stats->totalTicks){//wakeup time arrived
+		ready = (NachOSThread*)sleepingThreads->SortedRemove(&k); //Thread ready to wakeup
+		DEBUG('T', "\"%s\" is being woken from sleep\n", readyThread->getName());
+		IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
+		scheduler->MoveThreadToReadyQueue(ready);
+		(void) interrupt->SetLevel(oldLevel);	// re-enable interrupts
+	}
 }
 
 //----------------------------------------------------------------------
@@ -194,6 +207,7 @@ Cleanup()
     delete timer;
     delete scheduler;
     delete interrupt;
+    delete sleepingThreads;
     
     Exit(0);
 }
