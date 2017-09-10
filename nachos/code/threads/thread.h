@@ -40,6 +40,9 @@
 #include "copyright.h"
 #include "utility.h"
 
+#define MAXCHILDCOUNT 100
+
+
 #ifdef USER_PROGRAM
 #include "machine.h"
 #include "addrspace.h"
@@ -105,6 +108,12 @@ class NachOSThread {
     void Print() { printf("%s, ", name); }
     int GetPID();
     int GetPPID();
+    int childCount;
+    void SetChildExitCode(int childpid, int code);
+    int SearchChildpid(int a);
+    int JoinThreadWithChild(int index);	
+	
+	
 	
     void IncInstructionCount();
     unsigned GetInstructionCount();
@@ -127,6 +136,14 @@ class NachOSThread {
 
     unsigned instructionCount;	
 
+    int child_pids[MAXCHILDCOUNT];
+    int childexitcode[MAXCHILDCOUNT];
+   // int childCount;
+    int waitchildindex;	
+	
+	
+	
+	
 #ifdef USER_PROGRAM
 // A thread running a user program actually has *two* sets of CPU registers -- 
 // one for its state while executing user code, one for its state 
