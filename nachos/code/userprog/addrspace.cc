@@ -143,6 +143,7 @@ ProcessAddressSpace::ProcessAddressSpace()
 
         for(int i=0;i<size;i++)
             machine->mainMemory[child_start+i] = machine->mainMemory[parent_start+i];
+        printf("ProcessAddressSpace finished\n");
 }
 
 //----------------------------------------------------------------------
