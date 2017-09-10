@@ -341,7 +341,8 @@ ExceptionHandler(ExceptionType which)
         childthread->userRegisters[PrevPCReg] = machine->ReadRegister(PCReg);
         childthread->userRegisters[PCReg] = machine->ReadRegister(NextPCReg);
         childthread->userRegisters[NextPCReg] = machine->ReadRegister(PCReg) + 4;
-
+        childthread->userRegisters[2] = 0;
+        
         printf("check1\n");
         // preparing child's context
         childthread->CreateThreadStack(context, (int)childthread);
@@ -353,7 +354,7 @@ ExceptionHandler(ExceptionType which)
 
         // setting return vales of parent and child
         machine->WriteRegister(2,childthread->GetPID());
-        childthread->userRegisters[2] = 0;
+        
         printf("check4\n");
 
         //Advance program counters.

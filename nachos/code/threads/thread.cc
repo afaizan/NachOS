@@ -416,6 +416,11 @@ NachOSThread::JoinThreadWithChild(int index){
 
 void context(int arg)
 {
+    if(threadToBeDestroyed != NULL)
+    {
+        delete threadToBeDestroyed;
+        threadToBeDestroyed = NULL;
+    }
     if(currentThread->space != NULL)
     {
         currentThread->RestoreUserState();

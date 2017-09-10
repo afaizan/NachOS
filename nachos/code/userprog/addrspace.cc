@@ -139,7 +139,8 @@ ProcessAddressSpace::ProcessAddressSpace()
 
         physical_pages_covered += i;
         int parent_start = currentThread->space->KernelPageTable[0].physicalPage;
-        int child_start = physical_pages_covered * PageSize;
+        parent_start *= PageSize;
+        int child_start = KernelPageTable[0].physicalPage * PageSize;
 
         for(int i=0;i<size;i++)
             machine->mainMemory[child_start+i] = machine->mainMemory[parent_start+i];
