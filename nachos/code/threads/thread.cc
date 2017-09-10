@@ -46,12 +46,12 @@ NachOSThread::NachOSThread(char* threadName)
     if(pid == 1)
     {
         ppid = 0;
-        //parentthread = NULL;
+        parentthread = NULL;
     }
     else
     {
         ppid = currentThread->GetPID();
-        //parentthread = CurrentThread;
+        parentthread = currentThread;
     }
     space = NULL;
     stateRestored = true;
@@ -165,13 +165,19 @@ NachOSThread::CheckOverflow()
 //
 void
 NachOSThread::FinishThread ()
-{
+{	
     (void) interrupt->SetLevel(IntOff);		
     ASSERT(this == currentThread);
     
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
-    
+    if(childexitstatus[pid]){
+	if(parentthread == NULL)
+	    interrupt->Halt();
+ 	scheduler->MoveThreadToReadyQueue(parentthread);
+    }   
     threadToBeDestroyed = currentThread;
+    if(childCount == 0)
+	interrupt->Halt();
     PutThreadToSleep();					// invokes SWITCH
     // not reached
 }
