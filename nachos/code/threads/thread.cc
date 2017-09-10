@@ -329,7 +329,7 @@ NachOSThread::SaveUserState()
 {
     if (stateRestored) {
        for (int i = 0; i < NumTotalRegs; i++)
-	  userRegisters[i] = machine->ReadRegister(i);
+	       userRegisters[i] = machine->ReadRegister(i);
        stateRestored = false;
     }
 }
@@ -414,12 +414,14 @@ NachOSThread::JoinThreadWithChild(int index){
 
 }
 
-
-
-
-
-
-
+void context(int arg)
+{
+    if(currentThread->space != NULL)
+    {
+        currentThread->RestoreUserState();
+        currentThread->space->RestoreContextOnSwitch();
+    }
+    machine->Run();
+}
 
 #endif
-

@@ -85,14 +85,14 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
 // first, set up the translation 
     KernelPageTable = new TranslationEntry[numVirtualPages];
     for (i = 0; i < numVirtualPages; i++) {
-	KernelPageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
-	KernelPageTable[i].physicalPage = i;
-	KernelPageTable[i].valid = TRUE;
-	KernelPageTable[i].use = FALSE;
-	KernelPageTable[i].dirty = FALSE;
-	KernelPageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
-					// a separate page, we could set its 
-					// pages to be read-only
+    	KernelPageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
+    	KernelPageTable[i].physicalPage = i + physical_pages_covered;
+    	KernelPageTable[i].valid = TRUE;
+    	KernelPageTable[i].use = FALSE;
+    	KernelPageTable[i].dirty = FALSE;
+    	KernelPageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
+    					// a separate page, we could set its 
+    					// pages to be read-only
     }
     
 // zero out the entire address space, to zero the unitialized data segment 
@@ -112,7 +112,38 @@ ProcessAddressSpace::ProcessAddressSpace(OpenFile *executable)
         executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]),
 			noffH.initData.size, noffH.initData.inFileAddr);
     }
+    physical_pages_covered += i;
+}
 
+ProcessAddressSpace::ProcessAddressSpace()
+{
+       size = currentThread->space->size;
+       numVirtualPages = divRoundUp(size,PageSize);
+
+       ASSERT(numVirtualPages <= NumPhysPages);
+
+       DEBUG('a', "Initializing address space, num pages %d, size %d\n",numVirtualPages, size);
+
+       KernelPageTable = new TranslationEntry[numVirtualPages];
+       int i;
+        for (i = 0; i < numVirtualPages; i++) {
+            KernelPageTable[i].virtualPage = i; // for now, virtual page # = phys page #
+            KernelPageTable[i].physicalPage = i + physical_pages_covered;
+            KernelPageTable[i].valid = TRUE;
+            KernelPageTable[i].use = FALSE;
+            KernelPageTable[i].dirty = FALSE;
+            KernelPageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
+                            // a separate page, we could set its 
+                            // pages to be read-only
+        }
+
+        physical_pages_covered += i;
+        int parent_start = currentThread->space->KernelPageTable[0].physicalPage;
+        int child_start = physical_pages_covered * PageSize;
+
+        for(int i=0;i<size;i++)
+            machine->mainMemory[child_start+i] = machine->mainMemory[parent_start+i];
+        printf("ProcessAddressSpace finished\n");
 }
 
 //----------------------------------------------------------------------
