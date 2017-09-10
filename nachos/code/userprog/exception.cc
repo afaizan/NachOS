@@ -214,6 +214,93 @@ ExceptionHandler(ExceptionType which)
        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
 
    }
+   else if ((which == SyscallException) && (type == SysCall_Time))
+   {
+       machine->WriteRegister(2, stats->totalTicks);
+   
+       // Advance program counters.	   
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+   
+   }
+   else if ((which == SyscallException) && (type == SysCall_NumInstr))
+   {   
+       machine->WriteRegister(2, currentThread->GetInstructionCount());
+       
+       //Advance program counters.
+       machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+       machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+
+   }
+	else if((which == SyscallException) && (type == SysCall_Yield)){
+		currentThread->YieldCPU();
+		//Advance PC
+		machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+	        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+       		machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+	}
+    else if ((which == SyscallException) && (type == SysCall_Exec)){
+    	vaddr = machine->ReadRegister(4);
+    	char file[100];
+    	int i=0;
+    	machine->ReadMem(vaddr, 1, &memval);
+
+    	while((*(char *)&memval) != '\0'){
+    	    file[i] = *(char *)&memval;
+    	    i = i+1;
+    	    vaddr = vaddr+1;
+    	    machine->ReadMem(vaddr, 1, &memval);
+    	}
+    	file[i] = *(char *)&memval;
+
+    	OpenFile *executable = fileSystem->Open(file);
+    	if (executable == NULL){
+    	    printf("Unable to open file %s\n", file);
+    	    return;
+    	  }
+
+    	ProcessAddressSpace *space = new ProcessAddressSpace(executable);
+    	
+    	currentThread->space = space;
+
+    	space->InitUserModeCPURegisters();
+    	space->RestoreContextOnSwitch();
+
+    	machine->Run();
+        //	ASSERT(FALSE);
+    }
+    else if ((which == SyscallException) && (type == SysCall_Fork))
+    {
+        NachOSThread *childthread = new NachOSThread("child thread");
+        // define in addrspace.cc
+        ProcessAddressSpace *childspace = new ProcessAddressSpace();
+        childthread->space = childspace;
+
+        // saves the current machine register values
+        childthread->SaveUserState();
+
+        // setting the program counter of child so that child starts executing instr after fork call
+        childthread->userRegisters[PrevPCReg] = machine->ReadRegister(PCReg);
+        childthread->userRegisters[PCReg] = machine->ReadRegister(NextPCReg);
+        childthread->userRegisters[NextPCReg] = machine->ReadRegister(PCReg) + 4;
+
+        // preparing child's context
+        childthread->CreateThreadStack(context, (int)childthread);
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);
+        scheduler->MoveThreadToReadyQueue(childthread);
+        (void) interrupt->SetLevel(oldLevel);
+
+        // setting return vales of parent and child
+        machine->WriteRegister(2,childthread->GetPID());
+        childthread->userRegisters[2] = 0;
+
+        //Advance program counters.
+        machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+        machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+        machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
+    }
     else {
     	printf("Unexpected user mode exception %d %d\n", which, type);
     	ASSERT(FALSE);

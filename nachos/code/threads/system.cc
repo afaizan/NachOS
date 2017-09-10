@@ -18,6 +18,7 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+int physical_pages_covered = 0;
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;

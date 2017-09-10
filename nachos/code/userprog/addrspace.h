@@ -30,8 +30,9 @@ class ProcessAddressSpace {
 
     void SaveContextOnSwitch();			// Save/restore address space-specific
     void RestoreContextOnSwitch();		// info on a context switch 
+    int size;   // size of address space
 
-  private:
+  public:
     TranslationEntry *KernelPageTable;	// Assume linear page table translation
 					// for now!
     unsigned int numVirtualPages;		// Number of pages in the virtual 

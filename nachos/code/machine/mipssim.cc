@@ -37,10 +37,11 @@ Machine::Run()
 	       currentThread->getName(), stats->totalTicks);
     interrupt->setStatus(UserMode);
     for (;;) {
+		currentThread->IncInstructionCount();    
         OneInstruction(instr);
-	interrupt->OneTick();
-	if (singleStep && (runUntilTime <= stats->totalTicks))
-	  Debugger();
+		interrupt->OneTick();
+		if (singleStep && (runUntilTime <= stats->totalTicks))
+		  Debugger();
     }
 }
 
@@ -100,7 +101,7 @@ Machine::OneInstruction(Instruction *instr)
 
     // Fetch instruction 
     if (!machine->ReadMem(registers[PCReg], 4, &raw))
-	return;			// exception occurred
+		return;			// exception occurred
     instr->value = raw;
     instr->Decode();
 

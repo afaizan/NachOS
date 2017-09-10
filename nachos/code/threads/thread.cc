@@ -46,15 +46,16 @@ NachOSThread::NachOSThread(char* threadName)
     if(pid == 1)
     {
         ppid = 0;
-        //parentthread = NULL;
+        parentthread = NULL;
     }
     else
     {
         ppid = currentThread->GetPID();
-        //parentthread = CurrentThread;
+        parentthread = CurrentThread;
     }
     space = NULL;
     stateRestored = true;
+    instructionCount = 0;
 #endif
 }
 
@@ -317,7 +318,7 @@ NachOSThread::SaveUserState()
 {
     if (stateRestored) {
        for (int i = 0; i < NumTotalRegs; i++)
-	  userRegisters[i] = machine->ReadRegister(i);
+	       userRegisters[i] = machine->ReadRegister(i);
        stateRestored = false;
     }
 }
@@ -351,5 +352,26 @@ int NachOSThread::GetPPID()
     return this->ppid;
 }
 
+void
+NachOSThread::IncInstructionCount(void)
+{
+	instructionCount++;
+}	
+
+
+unsigned
+NachOSThread::GetInstructionCount(void)
+{
+	return this->instructionCount;
+}	
 #endif
 
+void context(int arg)
+{
+    if(currentThread->space != NULL)
+    {
+        currentThread->RestoreUserState();
+        currentThread->space->RestoreContextOnSwitch();
+    }
+    machine->Run();
+}
