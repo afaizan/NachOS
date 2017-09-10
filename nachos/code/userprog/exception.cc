@@ -328,7 +328,7 @@ ExceptionHandler(ExceptionType which)
 
     else if ((which == SyscallException) && (type == SysCall_Fork))
     {
-        printf("fork called\n");
+        //printf("fork called\n");
         NachOSThread *childthread = new NachOSThread("child thread");
         // define in addrspace.cc
         ProcessAddressSpace *childspace = new ProcessAddressSpace();
@@ -343,25 +343,25 @@ ExceptionHandler(ExceptionType which)
         childthread->userRegisters[NextPCReg] = machine->ReadRegister(PCReg) + 4;
         childthread->userRegisters[2] = 0;
         
-        printf("check1\n");
+        //printf("check1\n");
         // preparing child's context
         childthread->CreateThreadStack(context, (int)childthread);
-        printf("check2\n");
+        //printf("check2\n");
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         scheduler->MoveThreadToReadyQueue(childthread);
         (void) interrupt->SetLevel(oldLevel);
-        printf("check3\n");
+        //printf("check3\n");
 
         // setting return vales of parent and child
         machine->WriteRegister(2,childthread->GetPID());
         
-        printf("check4\n");
+       // printf("check4\n");
 
         //Advance program counters.
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
         machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
         machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg)+4);
-        printf("fork syscall finished \n");
+       // printf("fork syscall finished \n");
     }
     else {
     	printf("Unexpected user mode exception %d %d\n", which, type);
