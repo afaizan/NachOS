@@ -24,14 +24,13 @@ class ProcessScheduler {
 
     void MoveThreadToReadyQueue(NachOSThread* thread);	// Thread can be dispatched.
     NachOSThread* SelectNextReadyThread();		// Dequeue first thread on the ready 
-    void AddToSleepinglist(void* thread, int key);
-    void WakeSleepingThreads(int key);
+					// list, if any, and return thread.
     void ScheduleThread (NachOSThread* nextThread);	// Cause nextThread to start running
     void Print();			// Print contents of ready list
     
   private:
-    List *listOfReadyThreads;  		// queue of threads that are ready to ,
-    List *sleepingThreads;				// but not running
+    List *listOfReadyThreads;  		// queue of threads that are ready to run,
+				// but not running
 };
 
 #endif // SCHEDULER_H

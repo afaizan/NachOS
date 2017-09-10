@@ -4,6 +4,7 @@ int
 main()
 {
     int array[SIZE], i, sum=0;
+
     for (i=0; i<SIZE; i++) array[i] = i;
     for (i=0; i<SIZE; i++) sum += array[i];
     syscall_wrapper_PrintString("Total sum: ");

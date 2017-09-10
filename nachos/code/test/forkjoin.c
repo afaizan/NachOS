@@ -10,6 +10,7 @@ main()
     syscall_wrapper_PrintInt(syscall_wrapper_GetPID());
     syscall_wrapper_PrintChar('\n');
     x = syscall_wrapper_Fork();
+    syscall_wrapper_PrintInt(x);
     if (x == 0) {
        syscall_wrapper_PrintString("Child PID: ");
        syscall_wrapper_PrintInt(syscall_wrapper_GetPID());
@@ -34,7 +35,7 @@ main()
        syscall_wrapper_PrintString("Parent after fork waiting for child: ");
        syscall_wrapper_PrintInt(x);
        syscall_wrapper_PrintChar('\n');
-       syscall_wrapper_Join(x);
+       // syscall_wrapper_Join(x);
        syscall_wrapper_PrintString("Parent executed ");
        syscall_wrapper_PrintInt(syscall_wrapper_GetNumInstr());
        syscall_wrapper_PrintString(" instructions.\n");

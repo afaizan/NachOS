@@ -122,7 +122,7 @@ Interrupt::SetLevel(IntStatus now)
 
     ChangeLevel(old, now);			// change to new state
     if ((now == IntOn) && (old == IntOff))
-	OneTick();				// advance simulated time
+	   OneTick();				// advance simulated time
     return old;
 }
 
