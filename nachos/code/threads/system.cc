@@ -10,7 +10,6 @@
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
-
 NachOSThread *currentThread;			// the thread we are running now
 NachOSThread *threadToBeDestroyed;  		// the thread that just finished
 ProcessScheduler *scheduler;			// the ready list
@@ -19,6 +18,7 @@ Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
 
+bool childexitstatus[100];
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
 #endif
@@ -61,15 +61,17 @@ extern void Cleanup();
 static void
 TimerInterruptHandler(int dummy)
 {
+//    if (interrupt->getStatus() != IdleMode)
+//	interrupt->YieldOnReturn();
     if (interrupt->getStatus() != IdleMode)
 	interrupt->YieldOnReturn();
+    
+    scheduler->WakeSleepingThreads(stats->totalTicks);
 }
 
 //----------------------------------------------------------------------
 // Initialize
 // 	Initialize Nachos global data structures.  Interpret command
-//	line arguments in order to determine flags for the initialization.  
-// 
 //	"argc" is the number of command line arguments (including the name
 //		of the command) -- ex: "nachos -d +" -> argc = 3 
 //	"argv" is an array of strings, one for each command line argument
@@ -194,7 +196,6 @@ Cleanup()
     delete timer;
     delete scheduler;
     delete interrupt;
-    
     Exit(0);
 }
 

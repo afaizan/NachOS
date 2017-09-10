@@ -30,6 +30,7 @@
 ProcessScheduler::ProcessScheduler()
 { 
     listOfReadyThreads = new List; 
+    sleepingThreads = new List;
 } 
 
 //----------------------------------------------------------------------
@@ -40,6 +41,7 @@ ProcessScheduler::ProcessScheduler()
 ProcessScheduler::~ProcessScheduler()
 { 
     delete listOfReadyThreads; 
+    delete sleepingThreads;
 } 
 
 //----------------------------------------------------------------------
@@ -59,6 +61,24 @@ ProcessScheduler::MoveThreadToReadyQueue (NachOSThread *thread)
     listOfReadyThreads->Append((void *)thread);
 }
 
+void ProcessScheduler::WakeSleepingThreads(int currtime){
+	int key;
+	NachOSThread *thread=(NachOSThread*)sleepingThreads->SortedRemove(&key);
+	while(thread != NULL){
+		if(key > currtime){
+			sleepingThreads->SortedInsert(thread, key);
+			break;
+		}
+		else{
+			MoveThreadToReadyQueue(thread);
+		}
+		thread = (NachOSThread*)sleepingThreads->SortedRemove(&key);
+	}
+}
+
+void ProcessScheduler::AddToSleepinglist(void *thread, int key){
+	sleepingThreads->SortedInsert(thread,key);
+}
 //----------------------------------------------------------------------
 // ProcessScheduler::SelectNextReadyThread
 // 	Return the next thread to be scheduled onto the CPU.

@@ -15,11 +15,13 @@
 #include "interrupt.h"
 #include "stats.h"
 #include "timer.h"
-
+#include "list.h"
 // Initialization and cleanup routines
 extern void Initialize(int argc, char **argv); 	// Initialization,
 						// called before anything else
 extern void Cleanup();				// Cleanup, called when
+
+extern bool childexitstatus[100];
 						// Nachos is done.
 
 extern NachOSThread *currentThread;			// the thread holding the CPU

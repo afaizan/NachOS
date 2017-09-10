@@ -108,7 +108,7 @@ class NachOSThread {
     void Print() { printf("%s, ", name); }
     int GetPID();
     int GetPPID();
-    
+    int childCount;
     void SetChildExitCode(int childpid, int code);
     int SearchChildpid(int a);
     int JoinThreadWithChild(int index);	
@@ -138,8 +138,7 @@ class NachOSThread {
 
     int child_pids[MAXCHILDCOUNT];
     int childexitcode[MAXCHILDCOUNT];
-    bool childexitstatus[MAXCHILDCOUNT];
-    int childCount;
+   // int childCount;
     int waitchildindex;	
 	
 	
