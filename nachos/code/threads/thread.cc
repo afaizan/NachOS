@@ -51,7 +51,7 @@ NachOSThread::NachOSThread(char* threadName)
     else
     {
         ppid = currentThread->GetPID();
-        parentthread = CurrentThread;
+        parentthread = currentThread;
     }
     space = NULL;
     stateRestored = true;
@@ -364,7 +364,7 @@ NachOSThread::GetInstructionCount(void)
 {
 	return this->instructionCount;
 }	
-#endif
+
 
 void context(int arg)
 {
@@ -375,3 +375,5 @@ void context(int arg)
     }
     machine->Run();
 }
+
+#endif

@@ -273,6 +273,7 @@ ExceptionHandler(ExceptionType which)
     }
     else if ((which == SyscallException) && (type == SysCall_Fork))
     {
+        printf("fork called\n");
         NachOSThread *childthread = new NachOSThread("child thread");
         // define in addrspace.cc
         ProcessAddressSpace *childspace = new ProcessAddressSpace();
@@ -286,15 +287,19 @@ ExceptionHandler(ExceptionType which)
         childthread->userRegisters[PCReg] = machine->ReadRegister(NextPCReg);
         childthread->userRegisters[NextPCReg] = machine->ReadRegister(PCReg) + 4;
 
+        printf("check1\n");
         // preparing child's context
         childthread->CreateThreadStack(context, (int)childthread);
+        printf("check2\n");
         IntStatus oldLevel = interrupt->SetLevel(IntOff);
         scheduler->MoveThreadToReadyQueue(childthread);
         (void) interrupt->SetLevel(oldLevel);
+        printf("check3\n");
 
         // setting return vales of parent and child
         machine->WriteRegister(2,childthread->GetPID());
         childthread->userRegisters[2] = 0;
+        printf("check4\n");
 
         //Advance program counters.
         machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));

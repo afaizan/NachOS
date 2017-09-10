@@ -108,6 +108,9 @@ class NachOSThread {
 	
     void IncInstructionCount();
     unsigned GetInstructionCount();
+    void CreateThreadStack(VoidFunctionPtr func, int arg);
+                        // Allocate a stack for thread.
+                    // Used internally by ThreadFork()
 		
   private:
     // some of the private data for this class is listed above
@@ -118,9 +121,7 @@ class NachOSThread {
     ThreadStatus status;		// ready, running or blocked
     char* name;
 
-    void CreateThreadStack(VoidFunctionPtr func, int arg);
-    					// Allocate a stack for thread.
-					// Used internally by ThreadFork()
+    
 
     int pid, ppid;			
     NachOSThread* parentthread;

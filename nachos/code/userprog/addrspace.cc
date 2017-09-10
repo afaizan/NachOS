@@ -125,6 +125,7 @@ ProcessAddressSpace::ProcessAddressSpace()
        DEBUG('a', "Initializing address space, num pages %d, size %d\n",numVirtualPages, size);
 
        KernelPageTable = new TranslationEntry[numVirtualPages];
+       int i;
         for (i = 0; i < numVirtualPages; i++) {
             KernelPageTable[i].virtualPage = i; // for now, virtual page # = phys page #
             KernelPageTable[i].physicalPage = i + physical_pages_covered;
